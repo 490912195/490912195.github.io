@@ -1,0 +1,304 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>在线管理 · 镜华录</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:"PingFang SC","Microsoft YaHei",sans-serif;background:#1a1410;color:#f7f2ec;min-height:100vh}
+.header{background:#2c2416;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(196,149,106,0.15)}
+.header .logo{font-size:16px;letter-spacing:2px;color:#c4956a}
+.header .logo span{color:rgba(247,242,236,0.4)}
+.header a{color:rgba(247,242,236,0.4);text-decoration:none;font-size:12px;letter-spacing:1px}
+.header a:hover{color:#c4956a}
+.container{max-width:1100px;margin:0 auto;padding:24px}
+.hidden{display:none!important}
+.login-box{max-width:400px;margin:80px auto;text-align:center}
+.login-box h2{font-size:20px;letter-spacing:2px;margin-bottom:8px;color:#c4956a}
+.login-box p{font-size:12px;color:rgba(247,242,236,0.3);margin-bottom:24px;line-height:1.6}
+.login-box input{width:100%;padding:10px 14px;background:rgba(255,255,255,0.05);border:1px solid rgba(196,149,106,0.2);border-radius:4px;color:#f7f2ec;font-size:13px;font-family:monospace;margin-bottom:12px;outline:none}
+.login-box input:focus{border-color:#c4956a}
+.login-box button{width:100%;padding:10px;background:#c4956a;color:#1a1410;border:none;border-radius:4px;font-size:13px;letter-spacing:1px;cursor:pointer;font-family:inherit;font-weight:500}
+.login-box button:hover{background:#d4a57a}
+.login-box .error{color:#e06050;font-size:12px;margin-top:8px}
+.login-box .hint{font-size:11px;color:rgba(247,242,236,0.2);margin-top:12px}
+.login-box .hint a{color:#c4956a}
+.stats{display:flex;gap:16px;margin-bottom:20px}
+.stat-card{padding:12px 20px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.05);border-radius:4px;flex:1;text-align:center}
+.stat-card .num{font-size:24px;font-weight:600;color:#c4956a}
+.stat-card .label{font-size:11px;color:rgba(247,242,236,0.3);letter-spacing:1px;margin-top:2px}
+.cat-bar{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px}
+.cat-btn{padding:6px 16px;border:1px solid rgba(196,149,106,0.25);border-radius:16px;background:transparent;color:rgba(247,242,236,0.5);font-size:12px;letter-spacing:1px;cursor:pointer;font-family:inherit;transition:.3s}
+.cat-btn:hover{border-color:#c4956a;color:#c4956a}
+.cat-btn.active{background:#c4956a;border-color:#c4956a;color:#1a1410;font-weight:500}
+.upload-row{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.upload-btn{padding:8px 20px;background:#c4956a;color:#1a1410;border:none;border-radius:4px;cursor:pointer;font-size:12px;letter-spacing:1px;font-family:inherit;font-weight:500}
+.upload-btn:hover{background:#d4a57a}
+.upload-btn:disabled{background:rgba(196,149,106,0.3)}
+.upload-row input{display:none}
+.upload-row .hint{font-size:11px;color:rgba(247,242,236,0.2)}
+.gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-bottom:20px;min-height:80px}
+.gallery-item{position:relative;border-radius:4px;overflow:hidden;background:rgba(255,255,255,0.03);aspect-ratio:3/4}
+.gallery-item img{width:100%;height:100%;object-fit:cover}
+.gallery-item .del{position:absolute;top:4px;right:4px;width:22px;height:22px;border-radius:50%;background:rgba(200,30,30,0.85);color:#fff;border:none;cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;opacity:0;line-height:1}
+.gallery-item:hover .del{opacity:1}
+.gallery-item .del:hover{background:#c00}
+.gallery-item .fname{position:absolute;bottom:0;left:0;right:0;padding:4px 6px;background:linear-gradient(transparent,rgba(0,0,0,0.85));font-size:10px;color:rgba(255,255,255,0.6);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gallery-empty{grid-column:1/-1;padding:40px;text-align:center;color:rgba(247,242,236,0.1);font-size:12px;border:1px dashed rgba(247,242,236,0.06);border-radius:4px}
+.action-bar{display:flex;align-items:center;gap:16px;padding:16px 20px;background:rgba(196,149,106,0.06);border:1px solid rgba(196,149,106,0.12);border-radius:4px}
+.action-bar .info{font-size:12px;color:rgba(247,242,236,0.4);flex:1}
+.action-bar .info strong{color:#c4956a}
+.save-btn{padding:10px 28px;background:#c4956a;color:#1a1410;border:none;border-radius:4px;cursor:pointer;font-size:13px;letter-spacing:1px;font-family:inherit;font-weight:500}
+.save-btn:hover{background:#d4a57a}
+.save-btn:disabled{background:rgba(196,149,106,0.3)}
+.status{font-size:12px;color:rgba(247,242,236,0.3);padding:6px 0;min-height:24px}
+.status.done{color:#6a8}
+.status.err{color:#e06050}
+@media(max-width:640px){.gallery{grid-template-columns:repeat(2,1fr)}.container{padding:16px}.header{padding:10px 16px}.stats{flex-wrap:wrap}.stat-card{padding:8px 12px}.stat-card .num{font-size:18px}}
+</style>
+</head>
+<body>
+<div class="header">
+<div class="logo">镜华录 <span>· 在线管理</span></div>
+<a href="https://490912195.github.io" target="_blank">查看作品集</a>
+</div>
+<div class="container">
+
+<div class="login-box" id="loginBox">
+<h2>连接 GitHub</h2>
+<p>输入 GitHub Token 以管理作品集</p>
+<input type="password" id="tokenInput" placeholder="粘贴 Token（ghp_...）">
+<button onclick="login()">连接</button>
+<div class="error" id="loginError"></div>
+<div class="hint">Token 在 <a href="https://github.com/settings/tokens" target="_blank">github.com/settings/tokens</a> 查看</div>
+</div>
+
+<div id="dashboard" class="hidden">
+<div class="stats">
+<div class="stat-card"><div class="num" id="statTotal">0</div><div class="label">照片总数</div></div>
+<div class="stat-card"><div class="num" id="statCats">0</div><div class="label">有照片分类</div></div>
+</div>
+<div class="cat-bar" id="catBar"></div>
+<div class="upload-row">
+<button class="upload-btn" id="uploadBtn">+ 选择照片</button>
+<input type="file" id="fileInput" accept="image/*" multiple>
+<span class="hint">上传到当前选定分类</span>
+</div>
+<div class="gallery" id="gallery"></div>
+<div class="action-bar">
+<div class="info">共 <strong id="totalCount">0</strong> 张 · <span id="pendingInfo">无待保存</span></div>
+<button class="save-btn" id="saveBtn" disabled onclick="saveAll()">保存并部署</button>
+</div>
+<div class="status" id="status"></div>
+</div>
+</div>
+
+<script>
+const OWNER = '490912195';
+const REPO = '490912195.github.io';
+const API = `https://api.github.com/repos/${OWNER}/${REPO}`;
+const CATEGORIES = [
+{id:'tangfeng',name:'唐风'},{id:'tang',name:'唐制·小唐风'},{id:'ming',name:'明制·典雅'},
+{id:'zhanguo',name:'战国袍'},{id:'weijin',name:'魏晋风·飘逸'},{id:'fuyuan',name:'复原风'},
+{id:'modern',name:'现代·日常'},{id:'couple',name:'情侣'},{id:'parentchild',name:'亲子'}
+];
+
+let token = '';
+let activeCat = 'tangfeng';
+// Per-category image store: { catId: [{name, url, sha}] }
+let catImages = {};
+// Works data + SHA
+let worksData = [];
+let worksSha = '';
+let pendingChanges = 0;
+
+// GitHub API Helper
+async function gh(method, path, body) {
+  const h = { Authorization: 'Bearer ' + token, Accept: 'application/vnd.github.v3+json' };
+  if (body) h['Content-Type'] = 'application/json';
+  const r = await fetch(API + path, { method, headers: h, body: body ? JSON.stringify(body) : null });
+  if (r.status === 404) return null;
+  if (!r.ok) { const t = await r.text(); throw new Error(method + ' ' + path + ': ' + r.status); }
+  return r.json();
+}
+
+// Login
+async function login() {
+  token = document.getElementById('tokenInput').value.trim();
+  if (!token) return;
+  document.getElementById('loginError').textContent = '';
+  try {
+    const user = await fetch('https://api.github.com/user', { headers: { Authorization: 'Bearer ' + token } }).then(r => { if (!r.ok) throw Error('无效'); return r.json(); });
+    if (user.login !== OWNER) { document.getElementById('loginError').textContent = 'Token 不属于用户 ' + OWNER; return; }
+    localStorage.setItem('gh_token', token);
+    document.getElementById('loginBox').classList.add('hidden');
+    document.getElementById('dashboard').classList.remove('hidden');
+    await loadAll();
+  } catch (e) {
+    document.getElementById('loginError').textContent = 'Token 无效，请重新生成';
+  }
+}
+
+// Load all data from GitHub
+async function loadAll() {
+  status('加载中...');
+  try {
+    // 1. Read works-data.js
+    const wf = await gh('GET', '/contents/data/works-data.js');
+    if (wf) {
+      worksSha = wf.sha;
+      const raw = atob(wf.content.replace(/\n/g, ''));
+      const si = raw.indexOf('['), ei = raw.lastIndexOf(']');
+      worksData = (si >= 0 && ei > si) ? JSON.parse(raw.substring(si, ei + 1)) : [];
+    } else {
+      worksData = []; worksSha = '';
+    }
+
+    // 2. List images/ folder
+    const imgs = await gh('GET', '/contents/images');
+    const imgMap = {}; // filename -> {sha, url}
+    if (imgs && Array.isArray(imgs)) {
+      imgs.forEach(f => { if (f.type === 'file') imgMap[f.name] = { sha: f.sha, url: f.download_url }; });
+    }
+
+    // 3. Build per-category image list
+    catImages = {};
+    CATEGORIES.forEach(c => catImages[c.id] = []);
+    worksData.forEach(w => {
+      if (w.img && w.img.startsWith('images/')) {
+        const fn = w.img.replace('images/', '');
+        const info = imgMap[fn] || { sha: '', url: 'https://raw.githubusercontent.com/' + OWNER + '/' + REPO + '/main/images/' + fn };
+        if (!catImages[w.cat]) catImages[w.cat] = [];
+        catImages[w.cat].push({ name: fn, url: info.url, sha: info.sha, workId: w.id });
+      }
+    });
+
+    renderAll();
+    status('已加载 ' + worksData.length + ' 张照片', 'done');
+  } catch (e) {
+    status('加载失败: ' + e.message, 'err');
+  }
+}
+
+function renderAll() {
+  // Category bar
+  const bar = document.getElementById('catBar');
+  bar.innerHTML = '';
+  CATEGORIES.forEach(c => {
+    const n = (catImages[c.id] || []).length;
+    bar.innerHTML += '<button class="cat-btn' + (c.id === activeCat ? ' active' : '') + '" onclick="switchCat(\'' + c.id + '\')">' + c.name + ' (' + n + ')</button>';
+  });
+  renderGallery();
+  updateStats();
+}
+
+function switchCat(id) {
+  activeCat = id;
+  renderAll();
+}
+
+function renderGallery() {
+  const g = document.getElementById('gallery');
+  const items = catImages[activeCat] || [];
+  if (!items.length) {
+    g.innerHTML = '<div class="gallery-empty">暂无照片 · 点击上方「选择照片」添加</div>';
+    return;
+  }
+  g.innerHTML = items.map((item, i) =>
+    '<div class="gallery-item"><img src="' + item.url + '" alt="' + item.name + '" onerror="this.parentNode.innerHTML=\'<div style=display:flex;align-items:center;justify-content:center;height:100%;color:rgba(255,255,255,0.1);font-size:11px>加载失败</div>\'"><button class="del" onclick="deletePhoto(' + i + ')">×</button><div class="fname">' + item.name + '</div></div>'
+  ).join('');
+}
+
+function updateStats() {
+  let total = 0, cats = 0;
+  CATEGORIES.forEach(c => {
+    const n = (catImages[c.id] || []).length;
+    total += n;
+    if (n > 0) cats++;
+  });
+  document.getElementById('statTotal').textContent = total;
+  document.getElementById('statCats').textContent = cats;
+  document.getElementById('totalCount').textContent = total;
+  document.getElementById('saveBtn').disabled = pendingChanges === 0;
+  document.getElementById('pendingInfo').textContent = pendingChanges ? pendingChanges + ' 项待保存' : '无待保存';
+}
+
+function status(msg, type) {
+  const el = document.getElementById('status');
+  el.textContent = msg;
+  el.className = 'status' + (type ? ' ' + type : '');
+}
+
+// Upload files
+document.getElementById('uploadBtn').onclick = () => document.getElementById('fileInput').click();
+document.getElementById('fileInput').onchange = async function() {
+  const files = this.files;
+  if (!files.length) return;
+  status('上传 ' + files.length + ' 张...');
+  let ok = 0;
+  for (const file of files) {
+    try {
+      const b64 = await new Promise((resolve, reject) => { const r = new FileReader(); r.onload = () => resolve(r.result.split(',')[1]); r.onerror = reject; r.readAsDataURL(file); });
+      const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+      const path = 'images/' + safeName;
+      await gh('PUT', '/contents/' + path, { message: 'Upload ' + path, content: b64, branch: 'main' });
+      // Add to works data
+      const maxId = worksData.length ? Math.max(...worksData.map(w => w.id)) : 0;
+      const nid = maxId + 1;
+      worksData.push({ id: nid, cat: activeCat, title: safeName.replace(/\.[^.]+$/, ''), desc: '', sub: '', img: path });
+      // Add to local catImages
+      if (!catImages[activeCat]) catImages[activeCat] = [];
+      catImages[activeCat].push({ name: safeName, url: 'https://raw.githubusercontent.com/' + OWNER + '/' + REPO + '/main/' + path, sha: '', workId: nid });
+      ok++;
+    } catch (e) { status(file.name + ' 失败', 'err'); }
+  }
+  this.value = '';
+  pendingChanges += files.length;
+  renderAll();
+  status('✓ 已上传 ' + ok + '/' + files.length + ' 张，点「保存并部署」生效', 'done');
+};
+
+// Delete photo from local state
+function deletePhoto(index) {
+  if (!confirm('确定删除？')) return;
+  const items = catImages[activeCat] || [];
+  if (index < 0 || index >= items.length) return;
+  const item = items[index];
+  items.splice(index, 1);
+  const imgPath = 'images/' + item.name;
+  const wi = worksData.findIndex(w => w.img === imgPath);
+  if (wi >= 0) worksData.splice(wi, 1);
+  pendingChanges++;
+  renderAll();
+  status('已标记删除，点「保存并部署」生效', 'done');
+}
+
+// Save all changes to GitHub
+async function saveAll() {
+  status('正在部署...');
+  document.getElementById('saveBtn').disabled = true;
+  document.getElementById('saveBtn').textContent = '部署中...';
+  try {
+    const js = 'const SERVER_WORKS = ' + JSON.stringify(worksData, null, 2) + ';\n';
+    const b64 = btoa(unescape(encodeURIComponent(js)));
+    const body = { message: 'Update works data from online admin', content: b64, branch: 'main' };
+    if (worksSha) body.sha = worksSha;
+    const r = await gh('PUT', '/contents/data/works-data.js', body);
+    worksSha = r.content.sha;
+    pendingChanges = 0;
+    renderAll();
+    status('✓ 部署成功！作品集 1-2 分钟更新', 'done');
+  } catch (e) {
+    status('部署失败: ' + e.message, 'err');
+  }
+  document.getElementById('saveBtn').textContent = '保存并部署';
+  document.getElementById('saveBtn').disabled = false;
+}
+
+// Auto-login
+const saved = localStorage.getItem('gh_token');
+if (saved) { document.getElementById('tokenInput').value = saved; login(); }
+</script>
+</body>
+</html>
