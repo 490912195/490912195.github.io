@@ -88,7 +88,7 @@ body{font-family:"PingFang SC","Microsoft YaHei",sans-serif;background:#1a1410;c
 <div class="gallery" id="gallery"></div>
 <div class="action-bar">
 <div class="info">共 <strong id="totalCount">0</strong> 张 · <span id="pendingInfo">无待保存</span></div>
-<button class="save-btn" id="saveBtn" disabled onclick="saveAll()">保存并部署</button>
+<button class="save-btn" id="saveBtn" onclick="saveAll()">保存并部署</button>
 </div>
 <div class="status" id="status"></div>
 </div>
@@ -220,7 +220,7 @@ function updateStats() {
   document.getElementById('statTotal').textContent = total;
   document.getElementById('statCats').textContent = cats;
   document.getElementById('totalCount').textContent = total;
-  document.getElementById('saveBtn').disabled = worksData.length === 0; document.getElementById('uploadBtn').disabled = false; document.getElementById('pendingInfo').textContent = worksData.length + ' 张照片 · 点保存部署到作品集';
+  document.getElementById('saveBtn').disabled = false; document.getElementById('uploadBtn').disabled = false;
   document.getElementById('pendingInfo').textContent = pendingChanges ? pendingChanges + ' 项待保存' : '无待保存';
 }
 
@@ -326,3 +326,5 @@ function compressImage(file, maxSize, quality) {
 }</script>
 </body>
 </html>
+
+
