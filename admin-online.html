@@ -240,7 +240,7 @@ document.getElementById('fileInput').onchange = async function() {
   for (const file of files) {
     try {
       // 自动压缩图片（最长边1920px，质量80%），上传快10倍
-      const compressedBlob = await compressImage(file, 1920, 0.8);
+      const compressedBlob = await compressImage(file, 1200, 0.8);
       const b64 = await new Promise((resolve, reject) => { const r = new FileReader(); r.onload = () => resolve(r.result.split(',')[1]); r.onerror = reject; r.readAsDataURL(compressedBlob); });
       const safeName = file.name.replace(/\.[^.]+$/, '') + '.jpg';
       const path = 'images/' + safeName;
@@ -327,5 +327,6 @@ function compressImage(file, maxSize, quality) {
 }</script>
 </body>
 </html>
+
 
 
