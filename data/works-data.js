@@ -38,5 +38,13 @@ const SERVER_WORKS = [
     "desc": "",
     "sub": "",
     "img": "images/902A6410.jpg"
+  },
+  {
+    "id": 6,
+    "cat": "tangfeng",
+    "title": "902A4249",
+    "desc": "",
+    "sub": "",
+    "img": "images/902A4249.jpg"
   }
 ];
