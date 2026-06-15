@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>二维码生成 · 镜华录</title>
+<title>二维码生成 · 啊咔</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:"PingFang SC","Microsoft YaHei",sans-serif;background:#1a1410;color:#f7f2ec;display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px}
@@ -23,7 +23,7 @@ body{font-family:"PingFang SC","Microsoft YaHei",sans-serif;background:#1a1410;c
 </head>
 <body>
 <div class="card">
-<h2>镜华录</h2>
+<h2>啊咔</h2>
 <div class="sub">长按或截图保存二维码</div>
 <div class="qr-wrap">
 <div id="qrContainer"></div>
@@ -89,7 +89,7 @@ function drawQR() {
     ctx.fillStyle = "#8b5e3c";
     ctx.font = '14px "PingFang SC","Microsoft YaHei",sans-serif';
     ctx.textAlign = "center";
-    ctx.fillText("镜 华 录 · 作 品 集", 200, 420);
+    ctx.fillText("啊  咔", 200, 420);
 
     ctx.fillStyle = "rgba(139,94,60,0.4)";
     ctx.font = '10px "PingFang SC","Microsoft YaHei",sans-serif';
@@ -101,7 +101,7 @@ function drawQR() {
     // Download button
     document.getElementById("saveBtn").onclick = function() {
       const link = document.createElement("a");
-      link.download = "作品集二维码.png";
+      link.download = "啊咔二维码.png";
       link.href = canvas.toDataURL("image/png");
       link.click();
     };
@@ -116,3 +116,4 @@ drawQR();
 </script>
 </body>
 </html>
+
