@@ -220,7 +220,7 @@ function updateStats() {
   document.getElementById('statTotal').textContent = total;
   document.getElementById('statCats').textContent = cats;
   document.getElementById('totalCount').textContent = total;
-  document.getElementById('saveBtn').disabled = pendingChanges === 0; document.getElementById('uploadBtn').disabled = false;
+  document.getElementById('saveBtn').disabled = worksData.length === 0; document.getElementById('uploadBtn').disabled = false; document.getElementById('pendingInfo').textContent = worksData.length + ' 张照片 · 点保存部署到作品集';
   document.getElementById('pendingInfo').textContent = pendingChanges ? pendingChanges + ' 项待保存' : '无待保存';
 }
 
