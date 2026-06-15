@@ -1,0 +1,151 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>照片管理 · 镜华录</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:"PingFang SC","Microsoft YaHei",sans-serif;background:#1a1410;color:#f7f2ec;min-height:100vh}
+.header{background:#2c2416;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(196,149,106,0.15);position:sticky;top:0;z-index:100}
+.header .logo{font-size:16px;letter-spacing:2px;color:#c4956a}
+.header .logo span{color:rgba(247,242,236,0.4);font-weight:300}
+.header .nav-links{display:flex;gap:16px;font-size:12px}
+.header .nav-links a{color:rgba(247,242,236,0.4);text-decoration:none;transition:.3s;letter-spacing:1px}
+.header .nav-links a:hover{color:#c4956a}
+.container{max-width:1100px;margin:0 auto;padding:24px}
+.section{margin-bottom:28px}
+.section-title{font-size:12px;letter-spacing:2px;color:rgba(247,242,236,0.3);margin-bottom:12px;text-transform:uppercase}
+.cat-bar{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:24px}
+.cat-btn{padding:6px 16px;border:1px solid rgba(196,149,106,0.25);border-radius:16px;background:transparent;color:rgba(247,242,236,0.5);font-size:12px;letter-spacing:1px;cursor:pointer;transition:.3s;font-family:inherit}
+.cat-btn:hover{border-color:#c4956a;color:#c4956a}
+.cat-btn.active{background:#c4956a;border-color:#c4956a;color:#1a1410;font-weight:500}
+.upload-area{display:flex;align-items:center;gap:12px;margin-bottom:20px}
+.upload-btn{padding:10px 24px;background:#c4956a;color:#1a1410;border:none;border-radius:4px;cursor:pointer;font-size:13px;letter-spacing:1px;transition:.3s;font-family:inherit;font-weight:500}
+.upload-btn:hover{background:#d4a57a}
+.upload-btn:disabled{background:rgba(196,149,106,0.3);cursor:default}
+.upload-area input{display:none}
+.upload-area .hint{font-size:12px;color:rgba(247,242,236,0.25);letter-spacing:1px}
+.gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:24px}
+.gallery-item{position:relative;border-radius:4px;overflow:hidden;background:rgba(255,255,255,0.03);aspect-ratio:3/4}
+.gallery-item img{width:100%;height:100%;object-fit:cover}
+.gallery-item .del{position:absolute;top:6px;right:6px;width:24px;height:24px;border-radius:50%;background:rgba(200,30,30,0.85);color:#fff;border:none;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;opacity:0;transition:.2s;line-height:1}
+.gallery-item:hover .del{opacity:1}
+.gallery-item .del:hover{background:#c00}
+.gallery-item .fname{position:absolute;bottom:0;left:0;right:0;padding:6px 8px;background:linear-gradient(transparent,rgba(0,0,0,0.85));font-size:11px;color:rgba(255,255,255,0.7);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gallery-empty{grid-column:1/-1;padding:40px;text-align:center;color:rgba(247,242,236,0.12);font-size:13px;letter-spacing:1px;border:1px dashed rgba(247,242,236,0.08);border-radius:4px}
+.export-bar{display:flex;align-items:center;gap:16px;padding:20px;background:rgba(196,149,106,0.06);border:1px solid rgba(196,149,106,0.12);border-radius:4px;margin-top:20px}
+.export-bar .count{font-size:13px;color:rgba(247,242,236,0.4)}
+.export-bar .count strong{color:#c4956a}
+.export-btn{padding:10px 28px;background:#c4956a;color:#1a1410;border:none;border-radius:4px;cursor:pointer;font-size:13px;letter-spacing:1px;transition:.3s;font-family:inherit;font-weight:500}
+.export-btn:hover{background:#d4a57a}
+.export-btn:disabled{background:rgba(196,149,106,0.3);cursor:default}
+.export-note{font-size:11px;color:rgba(247,242,236,0.2);line-height:1.5}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#c4956a;color:#1a1410;padding:10px 20px;border-radius:4px;font-size:12px;letter-spacing:1px;opacity:0;transition:opacity .3s;z-index:999;pointer-events:none}
+.toast.show{opacity:1}
+@media(max-width:640px){.gallery{grid-template-columns:repeat(2,1fr)}.gallery-item{aspect-ratio:1}.header{padding:10px 16px}.container{padding:16px}}@media(max-width:480px){.gallery{grid-template-columns:1fr}.cat-btn{padding:4px 12px;font-size:11px}.upload-btn{padding:8px 16px;font-size:12px}}
+</style>
+</head>
+<body>
+<div class="header">
+<div class="logo">镜华录 <span>· 照片管理</span></div>
+<div class="nav-links"><a href="index.html" target="_blank">查看作品集</a></div>
+</div>
+<div class="container">
+
+<div class="section">
+<div class="section-title">选择分类</div>
+<div class="cat-bar" id="catBar"></div>
+</div>
+
+<div class="section">
+<div class="section-title">上传照片</div>
+<div class="upload-area">
+<button class="upload-btn" id="uploadBtn">+ 选择照片</button>
+<input type="file" id="fileInput" accept="image/*" multiple>
+<span class="hint">从 images/ 文件夹中选择，支持多选</span>
+</div>
+</div>
+
+<div class="section">
+<div class="section-title" style="margin-bottom:8px">当前分类作品 (<span id="photoCount">0</span> 张)</div>
+<div class="gallery" id="gallery"></div>
+</div>
+
+<div class="export-bar">
+<div class="count">共 <strong id="totalCount">0</strong> 张照片</div>
+<button class="export-btn" id="exportBtn" disabled>导出作品数据</button>
+<div class="export-note">导出后下载 <strong>works-data.js</strong>，<br>放到 <strong>data/</strong> 文件夹替换原文件，刷新作品集即可看到照片</div>
+</div>
+
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+var CATEGORIES = [
+{id:'tangfeng', name:'唐风'},
+{id:'tang', name:'唐制·小唐风'},
+{id:'ming', name:'明制·典雅'},
+{id:'zhanguo', name:'战国袍'},
+{id:'weijin', name:'魏晋风·飘逸'},
+{id:'fuyuan', name:'复原风'},
+{id:'modern', name:'现代·日常'},
+{id:'couple', name:'情侣'},
+{id:'parentchild', name:'亲子'}
+];
+
+// Store: { catId -> [{id, name, title, desc, sub}] }
+var store = {};
+CATEGORIES.forEach(function(c){store[c.id]=[]});
+var idCounter = 1000;
+var activeCat = 'tangfeng';
+
+function toast(msg){var t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(function(){t.classList.remove('show')},2000)}
+
+function renderCats(){var bar=document.getElementById('catBar');bar.innerHTML='';CATEGORIES.forEach(function(c){var b=document.createElement('button');b.className='cat-btn'+(c.id===activeCat?' active':'');b.textContent=c.name;b.onclick=function(){activeCat=c.id;renderCats();renderGallery();updateTotal()};bar.appendChild(b)})}
+
+function renderGallery(){var g=document.getElementById('gallery');var items=store[activeCat]||[];document.getElementById('photoCount').textContent=items.length;if(items.length===0){g.innerHTML='<div class="gallery-empty">点击上方「选择照片」添加照片</div>';return}g.innerHTML=items.map(function(w){var src='images/'+w.name;return '<div class="gallery-item"><img src="'+src+'" alt="'+w.title+'" onerror="this.style.display=\'none\';this.parentNode.innerHTML+=\'<div style=display:flex;align-items:center;justify-content:center;height:100%;color:rgba(255,255,255,0.15);font-size:12px>图片不存在</div>\'"><button class="del" onclick="del('+w.id+')">×</button><div class="fname">'+w.title+'</div></div>'}).join('');updateTotal()}
+
+function del(id){store[activeCat]=store[activeCat].filter(function(w){return w.id!==id});renderGallery();toast('已移除')}
+
+function updateTotal(){var total=0;for(var k in store){total+=store[k].length}document.getElementById('totalCount').textContent=total;document.getElementById('exportBtn').disabled=total===0}
+
+// File input
+document.getElementById('uploadBtn').addEventListener('click',function(){document.getElementById('fileInput').click()});
+document.getElementById('fileInput').addEventListener('change',function(e){
+var files=e.target.files;if(!files.length)return;
+var items=store[activeCat]||[];
+for(var i=0;i<files.length;i++){
+var f=files[i];
+var name=f.name.replace(/\.[^.]+$/,'');
+items.push({id:idCounter++,name:f.name,title:name,desc:activeCat+' · 新作',sub:'人像',cat:activeCat});
+}
+store[activeCat]=items;
+renderGallery();
+this.value='';
+toast('已添加 '+files.length+' 张照片');
+});
+
+// Export
+document.getElementById('exportBtn').addEventListener('click',function(){
+var all=[];
+for(var k in store){store[k].forEach(function(w){all.push(w)})}
+if(all.length===0){toast('还没有照片');return}
+var js='const SERVER_WORKS = '+JSON.stringify(all,null,2)+';\n';
+var blob=new Blob([js],{type:'application/javascript'});
+var a=document.createElement('a');
+a.href=URL.createObjectURL(blob);
+a.download='works-data.js';
+document.body.appendChild(a);
+a.click();
+document.body.removeChild(a);
+URL.revokeObjectURL(a.href);
+toast('已导出 '+all.length+' 张照片数据')
+});
+
+renderCats();
+renderGallery();
+updateTotal();
+</script>
+</body>
+</html>
