@@ -255,10 +255,11 @@ document.getElementById('fileInput').onchange = async function() {
       ok++;
     } catch (e) { status(file.name + ' 失败', 'err'); }
   }
+  var fileCount = files.length;
   this.value = '';
-  pendingChanges += files.length;
+  pendingChanges += fileCount;
   renderAll();
-  status('✓ 已上传 ' + ok + '/' + files.length + ' 张，点「保存并部署」生效', 'done');
+  status('✓ 已上传 ' + ok + '/' + fileCount + ' 张，点「保存并部署」生效', 'done');
 };
 
 // Delete photo from local state
