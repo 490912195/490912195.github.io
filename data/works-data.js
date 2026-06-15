@@ -10,25 +10,9 @@ const SERVER_WORKS = [
   {
     "id": 2,
     "cat": "tang",
-    "title": "902A6415",
+    "title": "902A6384",
     "desc": "",
     "sub": "",
-    "img": "images/902A6415.jpg"
-  },
-  {
-    "id": 3,
-    "cat": "tang",
-    "title": "902A6416",
-    "desc": "",
-    "sub": "",
-    "img": "images/902A6416.jpg"
-  },
-  {
-    "id": 4,
-    "cat": "tang",
-    "title": "902A6376",
-    "desc": "",
-    "sub": "",
-    "img": "images/902A6376.jpg"
+    "img": "images/902A6384.jpg"
   }
 ];
